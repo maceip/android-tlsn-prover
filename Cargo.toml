@@ -1,0 +1,84 @@
+[package]
+name = "tlsn-prover-android"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+log = "0.4"
+pollster = "0.2"
+
+async-trait = "0.1.67"
+async-tungstenite = { version = "0.22.2", features = ["tokio-native-tls"] }
+axum = { version = "0.6.18", features = ["ws"] }
+axum-core = "0.3.4"
+axum-macros = "0.3.8"
+base64 = "0.21.0"
+chrono = "0.4.31"
+csv = "1.3.0"
+futures = "0.3"
+futures-util = "0.3.28"
+http = "0.2.9"
+hyper = { version = "0.14", features = ["client", "http1", "server", "tcp"] }
+opentelemetry = { version = "0.19" }
+p256 = "0.13"
+rstest = "0.18"
+webpki-roots = "0.26.0"
+rustls = { version = "0.21" }
+rustls-pemfile = { version = "1.0.2" }
+serde = { version = "1.0.147", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9.21"
+sha1 = "0.10"
+structopt = "0.3.26"
+thiserror = "1"
+tlsn-prover = { git = "https://github.com/tlsnotary/tlsn", tag = "v0.1.0-alpha.3" }
+tlsn-verifier = { git = "https://github.com/tlsnotary/tlsn", tag = "v0.1.0-alpha.3" }
+tlsn-core = { git = "https://github.com/tlsnotary/tlsn", tag = "v0.1.0-alpha.3" }
+tokio = { version = "1", features = ["full"] }
+tokio-rustls = { version = "0.24.1" }
+tokio-util = { version = "0.7", features = ["compat"] }
+tower = { version = "0.4.12", features = ["make"] }
+tower-http = { version = "0.4.4", features = ["cors"] }
+tracing = "0.1"
+tracing-opentelemetry = "0.19"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+uuid = { version = "1.4.1", features = ["v4", "fast-rng"] }
+ws_stream_tungstenite = { version = "0.10.0", features = ["tokio_io"] }
+
+# For some reason logging within the egui crate isn't working, even with
+# the log feature. Maybe the android_logger crate is broken?
+egui = "0.22"
+egui-wgpu = { version = "0.22", features = [ "winit" ] }
+egui-winit = { version = "0.22", default-features = false, features = [ "android-native-activity" ] }
+
+[dev-dependencies]
+# specify vendored feature to use statically linked copy of OpenSSL
+hyper-tls = { version = "0.5.0", features = ["vendored"] }
+tls-server-fixture = { git = "https://github.com/tlsnotary/tlsn", tag = "v0.1.0-alpha.3" }
+tlsn-prover = { git = "https://github.com/tlsnotary/tlsn", tag = "v0.1.0-alpha.3" }
+tokio-native-tls = { version = "0.3.1", features = ["vendored"] }
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
+env_logger = "0.10"
+
+[target.'cfg(target_os = "android")'.dependencies]
+android_logger = "0.13.0"
+
+[features]
+default = []
+desktop = []
+
+[lib]
+name="na_egui"
+crate_type=["cdylib"]
+
+[[bin]]
+path="src/lib.rs"
+name="egui-test"
+required-features = [ "desktop" ]
+
+[target.aarch64-linux-android.dependencies]
+openssl = { version = "*", features = ["vendored"] }
